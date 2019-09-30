@@ -1,0 +1,598 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://scenes/background.tscn" type="PackedScene" id=1]
+[ext_resource path="res://sprites/panel_stats.png" type="Texture" id=2]
+[ext_resource path="res://sprites/number_large_0.png" type="Texture" id=3]
+[ext_resource path="res://sprites/colon.png" type="Texture" id=4]
+[ext_resource path="res://sprites/quote.png" type="Texture" id=5]
+[ext_resource path="res://sprites/quotes.png" type="Texture" id=6]
+[ext_resource path="res://sprites/button_menu.png" type="Texture" id=7]
+[ext_resource path="res://sprites/credits.png" type="Texture" id=8]
+[ext_resource path="res://sprites/label_statics.png" type="Texture" id=9]
+
+[sub_resource type="GDScript" id=1]
+
+script/source = "extends HBoxContainer
+
+const sprite_numbers = [
+	preload(\"res://sprites/number_large_0.png\"),
+	preload(\"res://sprites/number_large_1.png\"),
+	preload(\"res://sprites/number_large_2.png\"),
+	preload(\"res://sprites/number_large_3.png\"),
+	preload(\"res://sprites/number_large_4.png\"),
+	preload(\"res://sprites/number_large_5.png\"),
+	preload(\"res://sprites/number_large_6.png\"),
+	preload(\"res://sprites/number_large_7.png\"),
+	preload(\"res://sprites/number_large_8.png\"),
+	preload(\"res://sprites/number_large_9.png\")
+]
+
+signal counting_finished
+
+func _ready():
+	count_to_score()
+	pass
+
+func count_to_score():
+	var lerp_time = 0
+	var lerp_duration = 0.5
+	
+	while lerp_time < lerp_duration:
+		lerp_time += get_process_delta_time()
+		lerp_time = min(lerp_time, lerp_duration)
+		
+		var percent = lerp_time/ lerp_duration
+		set_number(int(lerp(0, game.score_best, percent)))
+		yield(get_tree(), \"idle_frame\")
+	
+	print(game.playtime_total)
+	emit_signal(\"counting_finished\")
+	pass
+
+func set_number(number):
+	for child in get_children():
+		child.free()
+	
+	for digit in utils.get_digits(number):
+		var texture_rect = TextureRect.new()
+		texture_rect.set_texture(sprite_numbers[digit])
+		add_child(texture_rect)
+	pass"
+_sections_unfolded = [ "Resource" ]
+
+[sub_resource type="GDScript" id=2]
+
+script/source = "extends HBoxContainer
+
+const sprite_numbers = [
+	preload(\"res://sprites/number_large_0.png\"),
+	preload(\"res://sprites/number_large_1.png\"),
+	preload(\"res://sprites/number_large_2.png\"),
+	preload(\"res://sprites/number_large_3.png\"),
+	preload(\"res://sprites/number_large_4.png\"),
+	preload(\"res://sprites/number_large_5.png\"),
+	preload(\"res://sprites/number_large_6.png\"),
+	preload(\"res://sprites/number_large_7.png\"),
+	preload(\"res://sprites/number_large_8.png\"),
+	preload(\"res://sprites/number_large_9.png\")
+]
+
+signal counting_finished
+
+func _ready():
+	count_to_score()
+	pass
+
+func count_to_score():
+	var lerp_time = 0
+	var lerp_duration = 0.5
+	
+	while lerp_time < lerp_duration:
+		lerp_time += get_process_delta_time()
+		lerp_time = min(lerp_time, lerp_duration)
+		
+		var percent = lerp_time/ lerp_duration
+		set_number(int(lerp(0, game.attempts, percent)))
+		yield(get_tree(), \"idle_frame\")
+	
+	emit_signal(\"counting_finished\")
+	pass
+
+func set_number(number):
+	for child in get_children():
+		child.free()
+	
+	for digit in utils.get_digits(number):
+		var texture_rect = TextureRect.new()
+		texture_rect.set_texture(sprite_numbers[digit])
+		add_child(texture_rect)
+	pass"
+
+[sub_resource type="GDScript" id=3]
+
+script/source = "extends HBoxContainer
+
+const sprite_numbers = [
+	preload(\"res://sprites/number_large_0.png\"),
+	preload(\"res://sprites/number_large_1.png\"),
+	preload(\"res://sprites/number_large_2.png\"),
+	preload(\"res://sprites/number_large_3.png\"),
+	preload(\"res://sprites/number_large_4.png\"),
+	preload(\"res://sprites/number_large_5.png\"),
+	preload(\"res://sprites/number_large_6.png\"),
+	preload(\"res://sprites/number_large_7.png\"),
+	preload(\"res://sprites/number_large_8.png\"),
+	preload(\"res://sprites/number_large_9.png\"),
+	preload(\"res://sprites/colon.png\"),
+	preload(\"res://sprites/quote.png\"),
+	preload(\"res://sprites/quotes.png\"),
+	
+]
+
+signal counting_finished
+
+var hours = 0
+var minuts = 0
+var minut1 = 0
+var minut2= 0
+var seconds = 0
+var second1 = 0
+var second2 = 0
+var texture_rect
+
+func _ready():
+	hours = int(game.playtime_total/3600)
+	minuts = int((game.playtime_total - 3600 * hours)/60)
+	seconds = int(game.playtime_total - 3600 * hours - 60 * minuts)
+	print(hours, \" \", minuts, \" \", seconds)
+	
+	#for child in get_children():
+	#	child.free()
+	
+	count_to_score()
+	pass
+
+func count_to_score():
+	var lerp_time = 0
+	var lerp_duration = 0.5
+	
+	while lerp_time < lerp_duration:
+		lerp_time += get_process_delta_time()
+		lerp_time = min(lerp_time, lerp_duration)
+		
+		var percent = lerp_time/ lerp_duration
+		
+		set_number(int(lerp(0, hours, percent)), $tex_hr)
+		
+		set_number(int(lerp(0, minuts, percent)/10), $tex_min1)
+		set_number(int(lerp(0, minuts, percent)), $tex_min2)
+		
+		set_number(int(lerp(0, seconds, percent)/10), $tex_sec1)
+		set_number(int(lerp(0, seconds, percent)), $tex_sec2)
+		
+		yield(get_tree(), \"idle_frame\")
+	
+	emit_signal(\"counting_finished\")
+	pass
+
+func set_number(number, target):
+	for digit in utils.get_digits(number):
+		target.set_texture(sprite_numbers[digit])
+	pass"
+
+[sub_resource type="GDScript" id=4]
+
+script/source = "extends TextureButton
+
+func _ready():
+	connect(\"pressed\", self, \"_on_pressed\")
+	pass
+
+func _on_pressed():
+	get_tree().set_pause(false)
+	stage_manager.change_stage(stage_manager.STAGE_MENU)
+	pass"
+_sections_unfolded = [ "Resource" ]
+
+[sub_resource type="GDScript" id=5]
+
+script/source = "extends TextureButton
+
+func _ready():
+	connect(\"pressed\", self, \"_on_pressed\")
+	pass
+
+func _on_pressed():
+	OS.shell_open(\"https://s4league.space\")
+	pass"
+_sections_unfolded = [ "Resource" ]
+
+[node name="statics_stage" type="Node"]
+
+[node name="camera" type="Camera2D" parent="." index="0"]
+
+offset = Vector2( -72, 0 )
+anchor_mode = 0
+rotating = false
+current = true
+zoom = Vector2( 1, 1 )
+limit_left = -10000000
+limit_top = -10000000
+limit_right = 10000000
+limit_bottom = 10000000
+limit_smoothed = false
+drag_margin_h_enabled = true
+drag_margin_v_enabled = true
+smoothing_enabled = false
+smoothing_speed = 5.0
+offset_v = 0.0
+offset_h = 0.0
+drag_margin_left = 0.2
+drag_margin_top = 0.2
+drag_margin_right = 0.2
+drag_margin_bottom = 0.2
+editor_draw_screen = true
+editor_draw_limits = false
+editor_draw_drag_margin = false
+_sections_unfolded = [ "Transform" ]
+
+[node name="background" parent="." index="1" instance=ExtResource( 1 )]
+
+[node name="hud" type="CanvasLayer" parent="." index="2"]
+
+layer = 1
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+
+[node name="cntr_stats" type="Container" parent="hud" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 40.0
+margin_bottom = 40.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+
+[node name="TextureRect" type="TextureRect" parent="hud/cntr_stats" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 16.0
+margin_top = 68.0
+margin_right = 129.0
+margin_bottom = 201.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 2 )
+stretch_mode = 0
+_sections_unfolded = [ "Rect", "Visibility" ]
+
+[node name="hbox_score_best" type="HBoxContainer" parent="hud/cntr_stats/TextureRect" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 37.0
+margin_top = 21.0
+margin_right = 77.0
+margin_bottom = 39.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+custom_constants/separation = 1
+alignment = 1
+script = SubResource( 1 )
+_sections_unfolded = [ "Rect", "custom_constants" ]
+
+[node name="tex_number_0" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_score_best" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 14.0
+margin_right = 26.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+
+[node name="hbox_attempts" type="HBoxContainer" parent="hud/cntr_stats/TextureRect" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 37.0
+margin_top = 62.0
+margin_right = 77.0
+margin_bottom = 80.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+custom_constants/separation = 1
+alignment = 1
+script = SubResource( 2 )
+_sections_unfolded = [ "Rect", "custom_constants" ]
+
+[node name="tex_number_0" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_attempts" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 14.0
+margin_right = 26.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+
+[node name="hbox_play_time" type="HBoxContainer" parent="hud/cntr_stats/TextureRect" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 2.0
+margin_top = 104.0
+margin_right = 111.0
+margin_bottom = 122.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+custom_constants/separation = 1
+alignment = 1
+script = SubResource( 3 )
+_sections_unfolded = [ "Rect", "custom_constants" ]
+
+[node name="tex_hr" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 11.0
+margin_right = 23.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+_sections_unfolded = [ "Rect" ]
+
+[node name="colon" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 24.0
+margin_right = 31.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 4 )
+stretch_mode = 0
+
+[node name="tex_min1" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 32.0
+margin_right = 44.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+
+[node name="tex_min2" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="3"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 45.0
+margin_right = 57.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+
+[node name="tex_quote" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="4"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 58.0
+margin_right = 63.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 5 )
+stretch_mode = 0
+
+[node name="tex_sec1" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="5"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 64.0
+margin_right = 76.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+
+[node name="tex_sec2" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="6"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 77.0
+margin_right = 89.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 3 )
+stretch_mode = 0
+
+[node name="tex_quotes" type="TextureRect" parent="hud/cntr_stats/TextureRect/hbox_play_time" index="7"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 90.0
+margin_right = 98.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 6 )
+stretch_mode = 0
+
+[node name="btn_menu" type="TextureButton" parent="hud/cntr_stats" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 52.0
+margin_top = 206.0
+margin_right = 92.0
+margin_bottom = 220.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+focus_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+group = null
+texture_normal = ExtResource( 7 )
+script = SubResource( 4 )
+_sections_unfolded = [ "Rect", "Textures" ]
+
+[node name="btn_credits" type="TextureButton" parent="hud" index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 46.0
+margin_top = 249.0
+margin_right = 99.0
+margin_bottom = 254.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+focus_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+group = null
+texture_normal = ExtResource( 8 )
+script = SubResource( 5 )
+_sections_unfolded = [ "Rect", "Textures" ]
+
+[node name="tex_gameover" type="TextureRect" parent="hud" index="2"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 40.0
+margin_top = 42.0
+margin_right = 104.0
+margin_bottom = 63.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+texture = ExtResource( 9 )
+stretch_mode = 0
+_sections_unfolded = [ "Focus", "Rect", "Visibility" ]
+
+
